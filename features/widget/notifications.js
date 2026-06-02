@@ -362,7 +362,7 @@ export class NotificationsWidgetFeature extends FeatureBase {
         this.wrapper = new St.BoxLayout({
             style_class: 'beqs-pane-container',
             vertical: false,
-            x_expand: true,
+            x_expand: false,
         });
 
         this.leftPane = new St.BoxLayout({

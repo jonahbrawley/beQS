@@ -19,6 +19,10 @@ export class OverlayMenu extends FeatureBase {
 
     _easeWithFallback(actor, params) {
         const { scale_x, scale_y, translation_y, advMode, fallbackMode } = params;
+        const onComplete = () => {
+            if (params.onComplete) params.onComplete();
+            this._onAnimationComplete(actor);
+        };
         try {
             AdvAni.ease(actor, {
                 scale_x,
@@ -26,6 +30,7 @@ export class OverlayMenu extends FeatureBase {
                 ...(translation_y !== undefined ? { translation_y } : {}),
                 mode: advMode,
                 duration: this.duration,
+                onComplete,
             });
         } catch (_e) {
             actor.ease({
@@ -34,6 +39,7 @@ export class OverlayMenu extends FeatureBase {
                 ...(translation_y !== undefined ? { translation_y } : {}),
                 duration: this.duration,
                 mode: fallbackMode,
+                onComplete,
             });
         }
     }
@@ -92,7 +98,7 @@ export class OverlayMenu extends FeatureBase {
             box.opacity = 0;
             box.translation_y = -60;
             box.ease({ opacity: 255, duration: fadeInDuration, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-            box.ease({ translation_y: 0, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_EXPO });
+            box.ease({ translation_y: 0, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_EXPO, onComplete: () => this._onAnimationComplete(box) });
             break;
 
         case "slide-up":
@@ -100,12 +106,12 @@ export class OverlayMenu extends FeatureBase {
             box.opacity = 0;
             box.translation_y = 60;
             box.ease({ opacity: 255, duration: fadeInDuration, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-            box.ease({ translation_y: 0, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_EXPO });
+            box.ease({ translation_y: 0, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_EXPO, onComplete: () => this._onAnimationComplete(box) });
             break;
 
         case "fade":
             box.opacity = 0;
-            box.ease({ opacity: 255, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+            box.ease({ opacity: 255, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_QUAD, onComplete: () => this._onAnimationComplete(box) });
             break;
 
         case "zoom":
@@ -114,7 +120,7 @@ export class OverlayMenu extends FeatureBase {
             box.scale_x = 0.4;
             box.scale_y = 0.4;
             box.ease({ opacity: 255, duration: fadeInDuration, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-            box.ease({ scale_x: 1, scale_y: 1, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_BACK });
+            box.ease({ scale_x: 1, scale_y: 1, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_BACK, onComplete: () => this._onAnimationComplete(box) });
             break;
 
         case "spin":
@@ -124,7 +130,7 @@ export class OverlayMenu extends FeatureBase {
             box.scale_y = 0.5;
             box.rotation_angle_z = -180;
             box.ease({ opacity: 255, duration: fadeInDuration, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-            box.ease({ scale_x: 1, scale_y: 1, rotation_angle_z: 0, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_BACK });
+            box.ease({ scale_x: 1, scale_y: 1, rotation_angle_z: 0, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_BACK, onComplete: () => this._onAnimationComplete(box) });
             break;
 
         case "flip":
@@ -132,7 +138,7 @@ export class OverlayMenu extends FeatureBase {
             box.opacity = 0;
             box.rotation_angle_x = 90;
             box.ease({ opacity: 255, duration: fadeInDuration, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-            box.ease({ rotation_angle_x: 0, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_BACK });
+            box.ease({ rotation_angle_x: 0, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_BACK, onComplete: () => this._onAnimationComplete(box) });
             break;
 
         case "bounce":
@@ -140,7 +146,7 @@ export class OverlayMenu extends FeatureBase {
             box.opacity = 0;
             box.translation_y = -120;
             box.ease({ opacity: 255, duration: fadeInDuration, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-            box.ease({ translation_y: 0, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_BOUNCE });
+            box.ease({ translation_y: 0, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_BOUNCE, onComplete: () => this._onAnimationComplete(box) });
             break;
 
         case "swing":
@@ -148,7 +154,7 @@ export class OverlayMenu extends FeatureBase {
             box.opacity = 0;
             box.rotation_angle_z = 15;
             box.ease({ opacity: 255, duration: fadeInDuration, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-            box.ease({ rotation_angle_z: 0, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_ELASTIC });
+            box.ease({ rotation_angle_z: 0, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_ELASTIC, onComplete: () => this._onAnimationComplete(box) });
             break;
 
         case "elastic":
@@ -157,7 +163,7 @@ export class OverlayMenu extends FeatureBase {
             box.scale_x = 0.3;
             box.scale_y = 0.3;
             box.ease({ opacity: 255, duration: fadeInDuration, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-            box.ease({ scale_x: 1, scale_y: 1, duration: Math.floor(this.duration * 1.5), mode: Clutter.AnimationMode.EASE_OUT_ELASTIC });
+            box.ease({ scale_x: 1, scale_y: 1, duration: Math.floor(this.duration * 1.5), mode: Clutter.AnimationMode.EASE_OUT_ELASTIC, onComplete: () => this._onAnimationComplete(box) });
             break;
 
         case "unfold":
@@ -166,8 +172,23 @@ export class OverlayMenu extends FeatureBase {
             box.scale_x = 1;
             box.scale_y = 0;
             box.ease({ opacity: 255, duration: fadeInDuration, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-            box.ease({ scale_y: 1, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_BACK });
+            box.ease({ scale_y: 1, duration: this.duration, mode: Clutter.AnimationMode.EASE_OUT_BACK, onComplete: () => this._onAnimationComplete(box) });
             break;
+        }
+    }
+
+    _onAnimationComplete(box) {
+        box.set_pivot_point(0, 0);
+        // Force GNOME Shell to recalculate submenu overlay constraints
+        // since notify::x/notify::y are not automatically emitted by scale/translation changes.
+        box.notify("x");
+        box.notify("y");
+        
+        // Also notify the grid if possible, to ensure full coverage
+        const grid = Global.QuickSettingsGrid;
+        if (grid) {
+            grid.notify("x");
+            grid.notify("y");
         }
     }
 
@@ -185,6 +206,8 @@ export class OverlayMenu extends FeatureBase {
         box.rotation_angle_z = 0;
         box.rotation_angle_x = 0;
         box.rotation_angle_y = 0;
+        
+        this._onAnimationComplete(box);
     }
 
     onMenuOpenStateChanged(_maid, _menu, isOpen) {
